@@ -2,17 +2,36 @@ def what_was_that_one_with(those_actors)
   # Find the movies starring all `those_actors` (an array of actor names).
   # Show each movie's title and id.
 
+  Movie
+    .select('movies.id, movies.title')
+    .joins(:actors)
+    .where('actors.name IN (?)', those_actors)
+    .group('movies.id')
+    .having('COUNT(actor_id) = (?)', those_actors.length)
+
 end
 
 def golden_age
   # Find the decade with the highest average movie score.
-
+  Movie
+    .select('AVG(movies.score), (yr/10)*10 AS decade')
+    .group('decade')
+    .order('AVG(movies.score) DESC')
+    .limit(1) #brings back Active Record Relation Object
+    .first
+    .decade
+    # .having('MAX(AVG(movies.score))') -- CANNOT DO THIS
+# We cannot do HAVING because the functions cannot be nested
 end
 
 def costars(name)
   # List the names of the actors that the named actor has ever
   # appeared with.
   # Hint: use a subquery
+# Subquery will be the movie.id an actor is in
+  subquery = Casting
+    .select(:movie_id)
+    .where(:actor_id)
 
 end
 
